@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# venv
+.venv/
+venv/
+
+# py2app build output
+build/dist/
+build/_py2app/
+dist/
+*.app/
+
+# macOS
+.DS_Store
+
+# Lokale Artefakte / Logs (Secrets liegen in ~/Library/Application Support bzw. Keychain, nie im Repo)
+*.log
+*.sqlite
+*.sqlite3
+*.db

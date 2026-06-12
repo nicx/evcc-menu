@@ -1,0 +1,6 @@
+# Runtime-Abhängigkeiten der App (Python 3.10+; entwickelt/getestet mit Homebrew 3.13).
+# Exakt gepinnt (Supply-Chain/Reproduzierbarkeit).
+rumps==0.4.0          # Menüleisten-UI (Status-Bar, Popover, Notifications)
+keyring==25.7.0       # Credentials im macOS-Keychain (für künftige Secrets)
+pync==2.0.3           # Fallback für macOS-Notifications (terminal-notifier)
+requests==2.32.3      # GitHub-Release-API (Updater)
