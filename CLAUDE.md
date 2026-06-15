@@ -96,3 +96,16 @@ Build/dist/venv/Logs/DB sind via `.gitignore` ausgeschlossen.
   nie kippt — siehe vorhandene `try/except`-Muster.
 - Bei Änderungen: Tests grün halten + `bash build/build.sh` + Boot-Smoke
   (`open dist/evcc-menu.app`, Prozess prüfen, beenden).
+
+## Gotchas
+- **py2app + `charset_normalizer`:** dessen mypyc-kompilierte `*__mypyc*.so` liegt im
+  site-packages-Root und wird von py2app sonst nicht mitgenommen — `build/setup.py` kopiert
+  sie explizit auf den Bundle-Python-Pfad. Bei „ModuleNotFoundError" im gebauten Bundle
+  hier zuerst schauen.
+- **Rollback nur bei kompatibler DB:** ein Binary-Downgrade nach einem Schema-Upgrade kann
+  scheitern → im Zweifel zusätzlich das DB-Backup zurückspielen (im UI so kommuniziert).
+- **GUI-Autostart nur im gebauten Bundle** (`sys.frozen`), nicht im Dev-Modus
+  (`python -m src.app`) — `autostart` löst sonst keine sinnvollen ProgramArguments auf.
+- **Menüleisten-Icons müssen quadratisch sein:** rumps zwingt das Icon auf 20×20, ein
+  nicht-quadratisches Rep würde gestaucht — `menubar_icon` rendert daher ins Quadrat mit
+  erhaltenem Seitenverhältnis.
