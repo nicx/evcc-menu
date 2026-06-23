@@ -582,7 +582,7 @@ class EvccMenuApp(rumps.App):
         if not getattr(sys, "frozen", False):
             return None
         macos_dir = os.path.dirname(sys.executable)              # …/Contents/MacOS
-        bundle = os.path.dirname(os.path.dirname(macos_dir))     # …/evcc-menu.app
+        bundle = os.path.dirname(os.path.dirname(macos_dir))     # …/evcc.app
         exe_name = os.path.splitext(os.path.basename(bundle))[0]
         try:
             with open(os.path.join(bundle, "Contents", "Info.plist"), "rb") as fh:
@@ -648,7 +648,7 @@ def _setup_logging() -> None:
     einzige verlässliche Diagnosequelle. Idempotent.
     """
     root = logging.getLogger()
-    if any(getattr(h, "_evcc_menu", False) for h in root.handlers):
+    if any(getattr(h, "_evcc", False) for h in root.handlers):
         return
     root.setLevel(logging.INFO)
     fmt = logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -656,14 +656,14 @@ def _setup_logging() -> None:
         fh = logging.handlers.RotatingFileHandler(
             paths.app_log_file(), maxBytes=1_000_000, backupCount=5, encoding="utf-8")
         fh.setFormatter(fmt)
-        fh._evcc_menu = True  # type: ignore[attr-defined]
+        fh._evcc = True  # type: ignore[attr-defined]
         root.addHandler(fh)
     except OSError:
         pass
 
     sh = logging.StreamHandler()
     sh.setFormatter(fmt)
-    sh._evcc_menu = True  # type: ignore[attr-defined]
+    sh._evcc = True  # type: ignore[attr-defined]
     root.addHandler(sh)
 
     def _log_uncaught(exc_type, exc, tb):
@@ -677,7 +677,7 @@ def _setup_logging() -> None:
 
 def main() -> None:
     _setup_logging()
-    LOGGER.info("evcc-menu startet (Log: %s)", paths.app_log_file())
+    LOGGER.info("evcc startet (Log: %s)", paths.app_log_file())
     EvccMenuApp().run()
 
 

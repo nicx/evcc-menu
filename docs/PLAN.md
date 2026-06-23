@@ -5,7 +5,7 @@
 Eine native macOS-Menübar-App soll eine manuell installierte evcc-Instanz terminalfrei
 verwalten (Install, Start/Stop/Restart, Updates mit Rollback, automatische SQLite-Backups,
 Log-Einsicht, E-Mail-Alarm bei Problemen). Die vollständige Handoff-Spec liegt in
-[evcc-menu-app-spec.md](evcc-menu-app-spec.md).
+[evcc-app-spec.md](evcc-app-spec.md).
 
 Zwei explizite Handoff-Vorgaben prägen diesen Plan:
 
@@ -45,7 +45,7 @@ Skelett gespiegelt von icloud-sync (`launcher.py` + `src/`-Paket + `build/setup.
 
 ```
 evcc/
-├── evcc-menu-app-spec.md        # bereits vorhanden
+├── evcc-app-spec.md        # bereits vorhanden
 ├── launcher.py                  # py2app-Entrypoint: from src.app import main
 ├── requirements.txt             # rumps==0.4.0, keyring==25.7.0, pync==2.0.3, requests
 ├── requirements-build.txt       # -r requirements.txt + py2app==0.28.10
@@ -61,7 +61,7 @@ evcc/
 │   ├── notifier_state.py        # NEU: State-Machine-Debounce (gibt's nirgends)
 │   ├── autostart.py             # PORT: LaunchAgent für App-Login-Autostart
 │   ├── menubar_icon.py          # PORT: Icon-Rendering (SF-Symbol tauschen)
-│   ├── paths.py                 # NEU/adaptiert: zentrale evcc-menu-Pfade
+│   ├── paths.py                 # NEU/adaptiert: zentrale evcc-Pfade
 │   ├── auth/
 │   │   ├── __init__.py
 │   │   └── keychain.py          # PORT: keyring-Wrapper (Service umbenennen)
@@ -80,13 +80,13 @@ evcc/
 | Quelle (icloud-sync) | Ziel | Anpassung |
 |---|---|---|
 | `src/notify.py` | `src/notify.py` | 1:1 — `notify()` (rumps→pync-Fallback) + `send_mail()` (klartext-SMTP an MailRelay). Stateless lassen. |
-| `src/auth/keychain.py` | `src/auth/keychain.py` | `KEYCHAIN_SERVICE` → `"evcc-menu"`; Legacy-Migration entfernen. (Nur falls künftig Secrets nötig — aktuell kein SMTP-Passwort.) |
+| `src/auth/keychain.py` | `src/auth/keychain.py` | `KEYCHAIN_SERVICE` → `"evcc"`; Legacy-Migration entfernen. (Nur falls künftig Secrets nötig — aktuell kein SMTP-Passwort.) |
 | `src/config/settings.py` | `src/config/settings.py` | `Settings`-Dataclass auf evcc-Felder umbauen (siehe §7 der Spec: backup/health/updates/notifications/logging). JSON-Atomic-Write + Forward-Compat-Parsing behalten. |
-| `src/config/paths.py` | `src/paths.py` | `APP_DIR_NAME="evcc-menu"`; Pfade gem. Spec §2 (bin/, evcc.db, Logs, LaunchAgents-Label `io.evcc.menu.agent`). |
-| `src/autostart.py` | `src/autostart.py` | `LABEL="de.nicx.evcc-menu"` (App-Autostart — **getrennt** vom evcc-Agent-Label `io.evcc.menu.agent`). plistlib + `launchctl load/unload -w`. |
+| `src/config/paths.py` | `src/paths.py` | `APP_DIR_NAME="evcc"`; Pfade gem. Spec §2 (bin/, evcc.db, Logs, LaunchAgents-Label `io.evcc.agent`). |
+| `src/autostart.py` | `src/autostart.py` | `LABEL="de.nicx.evcc"` (App-Autostart — **getrennt** vom evcc-Agent-Label `io.evcc.agent`). plistlib + `launchctl load/unload -w`. |
 | `src/menubar_icon.py` | `src/menubar_icon.py` | SF-Symbol `"icloud"` → `"bolt.car"`/`"bolt"`; Rendering-Logik unverändert. |
 | `src/app.py` (Muster) | `src/app.py` | Skelett übernehmen: `rumps.App`-Subklasse, 2-Tier-`rumps.Timer` (langsamer Dispatch-Tick + 1s-UI-Tick), `_spawn()` Daemon-Thread + `threading.Lock`, `rumps.Window`/`NSOpenPanel`-Dialoge. Menü gem. Spec §6 neu. |
-| `build/setup.py` (Muster) | `build/setup.py` | Bundle-ID `io.evcc.menu`, `LSUIElement: True`, `packages` ohne pyicloud (nicht gebraucht), dafür `requests`. |
+| `build/setup.py` (Muster) | `build/setup.py` | Bundle-ID `io.evcc`, `LSUIElement: True`, `packages` ohne pyicloud (nicht gebraucht), dafür `requests`. |
 
 ## Neu zu bauende Module (kein Vorbild in beiden Repos)
 
@@ -115,11 +115,11 @@ evcc/
 
 ## launchd-Plist (evcc-Agent) — konkretisiert
 
-`~/Library/LaunchAgents/io.evcc.menu.agent.plist`, ProgramArguments:
+`~/Library/LaunchAgents/io.evcc.agent.plist`, ProgramArguments:
 ```
-<binary> --database <app-support>/evcc-menu/evcc.db --log info
+<binary> --database <app-support>/evcc/evcc.db --log info
 ```
-`RunAtLoad=true`, `KeepAlive=true`, StdOut/StdErr → `~/Library/Logs/evcc-menu/evcc.log`.
+`RunAtLoad=true`, `KeepAlive=true`, StdOut/StdErr → `~/Library/Logs/evcc/evcc.log`.
 (Spec §5-Template mit verifizierten Flags statt Platzhalter-Kommentar.)
 
 ## Dev/Build-Befehle (von icloud-sync übernommen)
@@ -133,7 +133,7 @@ evcc/
 # Build
 .venv/bin/pip install -r requirements-build.txt
 .venv/bin/python build/setup.py py2app --dist-dir dist --bdist-base build/_py2app
-codesign --force --deep --sign - "dist/evcc-menu.app"   # ad-hoc
+codesign --force --deep --sign - "dist/evcc.app"   # ad-hoc
 # Tests (mock-basiert, kein Netz)
 .venv/bin/python tests/test_backup.py
 ```
@@ -170,7 +170,7 @@ SF-Symbol-Variante und sollen als Vorbild dienen.
 - Crash → eigenes Alert-Symbol `exclamationmark.triangle.fill`
 - Alle als **Template-Images** (auto-getönt für hell/dunkel) — keine Custom-Assets.
 
-**Übertragung auf evcc-menu:**
+**Übertragung auf evcc:**
 - `RUNNING` → `bolt.car.fill` (gefüllt)
 - `STOPPED` → `bolt.car` (outline)
 - `UNREACHABLE` (Agent geladen, antwortet nicht) → `bolt.car` (outline) **+** bestehendes

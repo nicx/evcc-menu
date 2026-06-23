@@ -4,7 +4,7 @@ Portiert aus iCloud-Sync. Schreibt/entfernt ein ``~/Library/LaunchAgents``-plist
 App beim Login startet. Bewusst ein LaunchAgent statt SMAppService: kommt ohne registrierten
 Helfer aus und funktioniert auch für ein ad-hoc-signiertes Eigengebrauch-Bundle.
 
-ACHTUNG: getrennt vom evcc-**Agenten** (Label ``io.evcc.menu.agent`` in :mod:`src.lifecycle`),
+ACHTUNG: getrennt vom evcc-**Agenten** (Label ``io.evcc.agent`` in :mod:`src.lifecycle`),
 der das evcc-Binary betreibt. Dieses Label hier startet die GUI-App selbst.
 """
 
@@ -18,7 +18,7 @@ from typing import Sequence
 
 LOGGER = logging.getLogger(__name__)
 
-LABEL = "de.nicx.evcc-menu"
+LABEL = "de.nicx.evcc"
 
 
 def plist_path() -> Path:

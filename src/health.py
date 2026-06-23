@@ -25,7 +25,7 @@ def probe(url: str, timeout: float = 5.0) -> str:
     Jede HTTP-Statuszeile (auch 4xx/5xx) bedeutet "Server lebt" — evcc kann je nach Pfad
     auch Redirects/Fehler liefern. Nur Verbindungsfehler/Timeout zählen als ``unreachable``.
     """
-    req = urllib.request.Request(url, method="GET", headers={"User-Agent": "evcc-menu"})
+    req = urllib.request.Request(url, method="GET", headers={"User-Agent": "evcc"})
     try:
         with urllib.request.urlopen(req, timeout=timeout):
             return RUNNING

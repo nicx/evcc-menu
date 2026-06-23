@@ -116,7 +116,7 @@ class NotifierState:
         sender = cfg.sender or cfg.recipient
         for attempt in range(1, _MAX_SEND_RETRIES + 1):
             ok = self._mailer(cfg.smtp_host, int(cfg.smtp_port), sender, cfg.recipient,
-                              f"evcc-menu: {subject}", body)
+                              f"evcc: {subject}", body)
             if ok:
                 return True
             LOGGER.warning("Mail-Versuch %d/%d fehlgeschlagen", attempt, _MAX_SEND_RETRIES)

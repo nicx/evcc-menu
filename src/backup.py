@@ -45,7 +45,7 @@ def check_target_writable(dest_dir: Path) -> None:
         raise BackupError(f"Backup-Ziel nicht erreichbar (nicht gemountet?): {dest_dir}")
     if not dest_dir.is_dir():
         raise BackupError(f"Backup-Ziel ist kein Verzeichnis: {dest_dir}")
-    probe = dest_dir / ".evcc-menu-writetest"
+    probe = dest_dir / ".evcc-writetest"
     try:
         probe.write_bytes(b"ok")
     except OSError as exc:

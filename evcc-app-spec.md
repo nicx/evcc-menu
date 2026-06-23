@@ -23,7 +23,7 @@
 ## 2. Projektstruktur (Vorschlag)
 
 ```
-evcc-menu/
+evcc/
 ├── evccmenu/
 │   ├── __init__.py
 │   ├── app.py              # rumps-App, Menüaufbau, Event-Dispatch
@@ -42,13 +42,13 @@ evcc-menu/
 ```
 
 **Pfade (Vorschlag):**
-- Binary: `~/Library/Application Support/evcc-menu/bin/evcc`
-- Vorgängerbinary (Rollback): `~/Library/Application Support/evcc-menu/bin/evcc.previous`
-- DB: `~/Library/Application Support/evcc-menu/evcc.db`  *(explizit gesetzt)*
-- evcc.yaml (optional): `~/Library/Application Support/evcc-menu/evcc.yaml`
-- Logfile: `~/Library/Logs/evcc-menu/evcc.log`
-- App-Config: `~/Library/Application Support/evcc-menu/config.json`
-- LaunchAgent: `~/Library/LaunchAgents/io.evcc.menu.agent.plist`
+- Binary: `~/Library/Application Support/evcc/bin/evcc`
+- Vorgängerbinary (Rollback): `~/Library/Application Support/evcc/bin/evcc.previous`
+- DB: `~/Library/Application Support/evcc/evcc.db`  *(explizit gesetzt)*
+- evcc.yaml (optional): `~/Library/Application Support/evcc/evcc.yaml`
+- Logfile: `~/Library/Logs/evcc/evcc.log`
+- App-Config: `~/Library/Application Support/evcc/config.json`
+- LaunchAgent: `~/Library/LaunchAgents/io.evcc.agent.plist`
 
 ---
 
@@ -60,8 +60,8 @@ evcc-menu/
 - **launchd-Plist erzeugen** (siehe §5), nach `~/Library/LaunchAgents` schreiben.
 - **Steuerung via launchctl** (moderne API bevorzugen):
   - Laden:   `launchctl bootstrap gui/$(id -u) <plist>`
-  - Entladen: `launchctl bootout gui/$(id -u)/io.evcc.menu.agent`
-  - Restart:  `launchctl kickstart -k gui/$(id -u)/io.evcc.menu.agent`
+  - Entladen: `launchctl bootout gui/$(id -u)/io.evcc.agent`
+  - Restart:  `launchctl kickstart -k gui/$(id -u)/io.evcc.agent`
   - *(Legacy `load -w` / `unload` als Fallback dokumentieren.)*
 - **DB-/Config-Pfad:** evcc so starten, dass DB-Pfad fest vorgegeben ist. Exakte Flag- bzw. evcc.yaml-Syntax (`database.dsn` o. ä.) gegen `evcc --help` / aktuelle Doku **verifizieren**, bevor implementiert wird.
 
@@ -130,10 +130,10 @@ evcc-menu/
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>io.evcc.menu.agent</string>
+    <string>io.evcc.agent</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/USERNAME/Library/Application Support/evcc-menu/bin/evcc</string>
+        <string>/Users/USERNAME/Library/Application Support/evcc/bin/evcc</string>
         <!-- DB-Pfad-Argument bzw. -c evcc.yaml hier ergänzen (Syntax verifizieren) -->
     </array>
     <key>RunAtLoad</key>
@@ -141,9 +141,9 @@ evcc-menu/
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/Users/USERNAME/Library/Logs/evcc-menu/evcc.log</string>
+    <string>/Users/USERNAME/Library/Logs/evcc/evcc.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/USERNAME/Library/Logs/evcc-menu/evcc.log</string>
+    <string>/Users/USERNAME/Library/Logs/evcc/evcc.log</string>
 </dict>
 </plist>
 ```
@@ -206,7 +206,7 @@ Beenden
     "recipient": "you@example.com"
   },
   "logging": {
-    "logfile": "~/Library/Logs/evcc-menu/evcc.log",
+    "logfile": "~/Library/Logs/evcc/evcc.log",
     "max_size_mb": 20,
     "level": "info"
   }

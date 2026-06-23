@@ -139,7 +139,7 @@ def download_file(url: str, dest: Path, timeout: float = 60.0) -> Path:
         raise ValueError(f"Download nur über HTTPS erlaubt, nicht: {url!r}")
     dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = dest.with_suffix(dest.suffix + ".part")
-    req = urllib.request.Request(url, headers={"User-Agent": "evcc-menu"})
+    req = urllib.request.Request(url, headers={"User-Agent": "evcc"})
     with urllib.request.urlopen(req, timeout=timeout) as resp, open(tmp, "wb") as fh:
         shutil.copyfileobj(resp, fh)
     tmp.replace(dest)

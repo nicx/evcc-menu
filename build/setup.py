@@ -1,6 +1,6 @@
 """py2app-Build-Konfiguration für das Menüleisten-Bundle.
 
-Baut ``evcc-menu.app`` als Menüleisten-Resident (``LSUIElement``).
+Baut ``evcc.app`` als Menüleisten-Resident (``LSUIElement``).
 
 Vom Repo-Root ausführen (py2app-Artefakte landen in ``dist/`` bzw. ``build/_py2app/``)::
 
@@ -48,9 +48,9 @@ OPTIONS = {
     "argv_emulation": False,
     "plist": {
         "LSUIElement": True,  # reine Menüleisten-App: kein Dock-Icon, kein Fenster
-        "CFBundleName": "evcc-menu",
-        "CFBundleDisplayName": "evcc-menu",
-        "CFBundleIdentifier": "io.evcc.menu",
+        "CFBundleName": "evcc",
+        "CFBundleDisplayName": "evcc",
+        "CFBundleIdentifier": "io.evcc",
         "CFBundleShortVersionString": "0.1.0",
         "CFBundleVersion": "0.1.0",
         "NSHumanReadableCopyright": "Privatgebrauch",

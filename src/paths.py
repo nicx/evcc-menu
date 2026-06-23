@@ -1,8 +1,8 @@
-"""Zentrale Pfaddefinitionen für evcc-menu.
+"""Zentrale Pfaddefinitionen für evcc.
 
-Alle persistenten Daten liegen unter ``~/Library/Application Support/evcc-menu/``
+Alle persistenten Daten liegen unter ``~/Library/Application Support/evcc/``
 (überlebt App-Updates, im Gegensatz zum Bundle-Inneren). Das evcc-Logfile liegt
-gem. macOS-Konvention separat unter ``~/Library/Logs/evcc-menu/``.
+gem. macOS-Konvention separat unter ``~/Library/Logs/evcc/``.
 
 Secrets liegen NICHT hier, sondern im macOS-Keychain (siehe :mod:`src.auth.keychain`).
 """
@@ -11,11 +11,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-APP_DIR_NAME = "evcc-menu"
+APP_DIR_NAME = "evcc"
 
 # Label des launchd-LaunchAgents, der das evcc-Binary betreibt (nicht zu verwechseln
 # mit dem App-Login-Autostart-Label in :mod:`src.autostart`).
-AGENT_LABEL = "io.evcc.menu.agent"
+AGENT_LABEL = "io.evcc.agent"
 
 
 def app_support_dir() -> Path:
@@ -62,7 +62,7 @@ settings_file = config_file
 
 
 def logs_dir() -> Path:
-    """Verzeichnis für Logdateien unter ``~/Library/Logs/evcc-menu`` (wird angelegt)."""
+    """Verzeichnis für Logdateien unter ``~/Library/Logs/evcc`` (wird angelegt)."""
     d = Path.home() / "Library" / "Logs" / APP_DIR_NAME
     d.mkdir(parents=True, exist_ok=True)
     return d
@@ -75,7 +75,7 @@ def evcc_log_file() -> Path:
 
 def app_log_file() -> Path:
     """Diagnose-Log der Menüleisten-App selbst (getrennt vom evcc-Log)."""
-    return logs_dir() / "evcc-menu.log"
+    return logs_dir() / "evcc-app.log"
 
 
 def agent_plist_path() -> Path:

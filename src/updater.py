@@ -74,7 +74,7 @@ def fetch_latest_release(timeout: float = 15.0) -> dict:
 
     resp = requests.get(
         LATEST_RELEASE_URL,
-        headers={"Accept": "application/vnd.github+json", "User-Agent": "evcc-menu"},
+        headers={"Accept": "application/vnd.github+json", "User-Agent": "evcc"},
         timeout=timeout,
     )
     resp.raise_for_status()

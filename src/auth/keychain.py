@@ -13,7 +13,7 @@ from typing import Optional
 import keyring
 
 # Einheitlicher Keychain-Service. Stabil halten — Änderungen "verlieren" gespeicherte Secrets.
-KEYCHAIN_SERVICE = "evcc-menu"
+KEYCHAIN_SERVICE = "evcc"
 
 
 def set_secret(account: str, value: str) -> None:

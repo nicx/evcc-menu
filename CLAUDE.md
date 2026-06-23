@@ -1,11 +1,11 @@
-# CLAUDE.md — Projektkontext evcc-menu
+# CLAUDE.md — Projektkontext evcc
 
 Native macOS-**Menüleisten-App** zur terminalfreien Verwaltung einer manuell installierten
 **evcc**-Instanz. Diese Datei fasst Architektur, Entscheidungen und Stolperfallen zusammen,
 damit eine frische Claude-Session (auch auf einem anderen Mac) sofort produktiv ist.
 
-- **Repo:** https://github.com/nicx/evcc-menu (public)
-- **Spec (Original-Handoff):** [evcc-menu-app-spec.md](evcc-menu-app-spec.md)
+- **Repo:** https://github.com/nicx/evcc (public)
+- **Spec (Original-Handoff):** [evcc-app-spec.md](evcc-app-spec.md)
 - **Detaillierter Umsetzungsplan:** [docs/PLAN.md](docs/PLAN.md)
 - **Stack:** Python 3.13 · rumps · py2app · launchd · SQLite · lokales MailRelay
 - **Herkunft:** Bausteine (notify, keychain, settings, autostart, menubar_icon, py2app-Skelett)
@@ -13,7 +13,7 @@ damit eine frische Claude-Session (auch auf einem anderen Mac) sofort produktiv 
 
 ## Architektur
 
-- Das **evcc-Binary** läuft als launchd-**LaunchAgent** `io.evcc.menu.agent` (nicht als Kind
+- Das **evcc-Binary** läuft als launchd-**LaunchAgent** `io.evcc.agent` (nicht als Kind
   der App) → läuft bei App-Quit/-Crash weiter, Autostart bei Login, `KeepAlive=true`.
 - Die App ist reines **Steuer-/Dashboard-Frontend** und kontrolliert den Agenten via
   `launchctl` (`bootstrap` / `bootout` / `kickstart -k`, Legacy `load/unload -w` als Fallback).
@@ -35,18 +35,18 @@ damit eine frische Claude-Session (auch auf einem anderen Mac) sofort produktiv 
 | `logs.py` | Tail, Console.app öffnen, größenbasierte Rotation |
 | `notify.py` | macOS-Notification + `send_mail` (klartext-SMTP an lokales Relay) — **PORT** |
 | `notifier_state.py` | **State-Machine-Debounce**: Mail nur bei Zustandswechsel; `notify_event` für Update-Infos |
-| `auth/keychain.py` | `keyring`-Wrapper (Service `evcc-menu`) — aktuell ohne Pflicht-Consumer |
+| `auth/keychain.py` | `keyring`-Wrapper (Service `evcc`) — aktuell ohne Pflicht-Consumer |
 | `config/settings.py` | verschachtelte Settings-Dataclasses + JSON (`config.json`), tolerant geladen |
 | `paths.py` | zentrale Pfade + Label-Konstanten |
 | `menubar_icon.py` | rendert 2 Template-PNGs (filled=läuft / outline=gestoppt) |
-| `autostart.py` | Login-Autostart der **GUI-App** (Label `de.nicx.evcc-menu`, getrennt vom evcc-Agenten) |
+| `autostart.py` | Login-Autostart der **GUI-App** (Label `de.nicx.evcc`, getrennt vom evcc-Agenten) |
 
 ### Laufzeit-Pfade
-- Binary/Vorgänger: `~/Library/Application Support/evcc-menu/bin/evcc[.previous]`
-- DB: `~/Library/Application Support/evcc-menu/evcc.db`
-- App-Config: `~/Library/Application Support/evcc-menu/config.json`
-- evcc-Logfile: `~/Library/Logs/evcc-menu/evcc.log`
-- Agent-Plist: `~/Library/LaunchAgents/io.evcc.menu.agent.plist`
+- Binary/Vorgänger: `~/Library/Application Support/evcc/bin/evcc[.previous]`
+- DB: `~/Library/Application Support/evcc/evcc.db`
+- App-Config: `~/Library/Application Support/evcc/config.json`
+- evcc-Logfile: `~/Library/Logs/evcc/evcc.log`
+- Agent-Plist: `~/Library/LaunchAgents/io.evcc.agent.plist`
 
 ## Wichtige Entscheidungen
 - **Mail-Transport über lokales MailRelay** (`127.0.0.1:2525`, klartext-SMTP, kein Auth/TLS).
@@ -86,7 +86,7 @@ Outline + rotes Badge `🔴` = nicht erreichbar. Alles Template-Images (auto-get
 for t in tests/test_*.py; do .venv/bin/python "$t"; done
 # Build der .app (py2app + ad-hoc-Signierung + verify)
 .venv/bin/pip install -r requirements-build.txt
-bash build/build.sh           # → dist/evcc-menu.app
+bash build/build.sh           # → dist/evcc.app
 ```
 Erststart der gebauten App: Rechtsklick → „Öffnen" (ad-hoc signiert → Gatekeeper).
 Build/dist/venv/Logs/DB sind via `.gitignore` ausgeschlossen.
@@ -96,7 +96,7 @@ Build/dist/venv/Logs/DB sind via `.gitignore` ausgeschlossen.
 - Best-effort-Fehlerbehandlung in I/O/Subprozessen (loggen statt werfen), damit UI/Betrieb
   nie kippt — siehe vorhandene `try/except`-Muster.
 - Bei Änderungen: Tests grün halten + `bash build/build.sh` + Boot-Smoke
-  (`open dist/evcc-menu.app`, Prozess prüfen, beenden).
+  (`open dist/evcc.app`, Prozess prüfen, beenden).
 
 ## Gotchas
 - **py2app + `charset_normalizer`:** dessen mypyc-kompilierte `*__mypyc*.so` liegt im
