@@ -27,6 +27,7 @@ damit eine frische Claude-Session (auch auf einem anderen Mac) sofort produktiv 
 | Datei | Zweck |
 |---|---|
 | `app.py` | rumps.App: Menü (Spec §6), Timer, Threading, Dialoge, verdrahtet alle Module |
+| `settings_window.py` | natives Settings-**Fenster** (PyObjC/`NSWindow`+`NSGridView`) + reine `build_settings`-Validierung; **rumps-frei** — erster Baustein der rumps→PyObjC-Vereinheitlichung |
 | `lifecycle.py` | Binary-Download/-Install, Tar-Extraktion, Quarantäne entfernen, Rollback, launchctl |
 | `health.py` | HTTP-Poll `:7070` → `running|stopped|unreachable`, Fehler-Schwellwert |
 | `backup.py` | `sqlite3.Connection.backup()` (WAL-sicher), Retention, `BackupScheduler` |
@@ -81,7 +82,7 @@ Outline + rotes Badge `🔴` = nicht erreichbar. Alles Template-Images (auto-get
 .venv/bin/pip install -r requirements.txt
 # Dev-Run (Menüleisten-App ohne Bundle)
 .venv/bin/python -m src.app
-# Tests (mock-basiert, kein Netz) — derzeit 26 grün
+# Tests (mock-frei, kein Netz) — derzeit 41 grün
 for t in tests/test_*.py; do .venv/bin/python "$t"; done
 # Build der .app (py2app + ad-hoc-Signierung + verify)
 .venv/bin/pip install -r requirements-build.txt

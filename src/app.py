@@ -19,7 +19,6 @@ import subprocess
 import sys
 import threading
 import time
-from functools import partial
 from pathlib import Path
 from typing import Optional
 
@@ -133,7 +132,6 @@ class EvccMenuApp(rumps.App):
         items.append(rumps.separator)
 
         items.append(rumps.MenuItem("Backup jetzt", callback=self._backup_now))
-        items.append(rumps.MenuItem("Backup-Ziel wählen…", callback=self._choose_backup_target))
         items.append(self._logs_menu())
         items.append(rumps.separator)
 
@@ -148,15 +146,10 @@ class EvccMenuApp(rumps.App):
         self._update_icon()
 
     def _logs_menu(self) -> rumps.MenuItem:
+        # Log-Level liegt jetzt im Settings-Fenster; hier nur noch Log-Aktionen.
         parent = rumps.MenuItem("Logs")
         parent.add(rumps.MenuItem("Log öffnen (Console)", callback=self._open_log_console))
         parent.add(rumps.MenuItem("Letzte 50 Zeilen", callback=self._show_last_lines))
-        level_menu = rumps.MenuItem("Log-Level")
-        for level in ("info", "debug"):
-            item = rumps.MenuItem(level.capitalize(), callback=partial(self._set_log_level, level))
-            item.state = 1 if self.settings.logging.level == level else 0
-            level_menu.add(item)
-        parent.add(level_menu)
         return parent
 
     def _setup_menubar_icon(self) -> None:
@@ -471,7 +464,28 @@ class EvccMenuApp(rumps.App):
     # -- Einstellungen -------------------------------------------------------
 
     def _open_settings(self, _sender=None) -> None:
-        """Sequenzielle Dialoge für Intervalle, Retention und Fehler-Mail (Abbruch beendet)."""
+        """Öffnet das native Settings-Fenster; Fallback auf die Dialogkette bei AppKit-Problemen."""
+        from . import settings_window
+
+        old_level = self.settings.logging.level
+        try:
+            edited = settings_window.run_settings_window(
+                self.settings, lambda msg, d: self._ask_directory(msg, d))
+        except Exception:  # noqa: BLE001 - im Zweifel nie blockieren
+            LOGGER.exception("Settings-Fenster nicht verfügbar, Fallback auf Dialogkette")
+            return self._open_settings_legacy()
+        if edited is None:
+            return  # Abbrechen: nichts geändert (kein In-place-Leak wie in der alten Kette)
+        self.settings = edited
+        save_settings(self.settings)
+        self._apply_settings()
+        if self.settings.logging.level != old_level:
+            self._spawn(self._apply_log_level)  # nur bei Änderung; threaded wie _set_log_level
+        self._needs_rebuild = True
+        notify.notify("evcc", "Einstellungen gespeichert.")
+
+    def _open_settings_legacy(self, _sender=None) -> None:
+        """Fallback: sequenzielle Dialoge für Intervalle, Retention und Fehler-Mail (Abbruch beendet)."""
         s = self.settings
         val = self._ask_text("Backup-Zeitplan (hourly / daily / weekly):", "Einstellungen",
                              default=s.backup.schedule)
