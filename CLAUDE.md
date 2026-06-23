@@ -110,3 +110,24 @@ Build/dist/venv/Logs/DB sind via `.gitignore` ausgeschlossen.
 - **Menüleisten-Icons müssen quadratisch sein:** rumps zwingt das Icon auf 20×20, ein
   nicht-quadratisches Rep würde gestaucht — `menubar_icon` rendert daher ins Quadrat mit
   erhaltenem Seitenverhältnis.
+
+## Richtung: rumps → PyObjC (gestaffelt)
+
+Strategische Festlegung: **bei Python bleiben und die UI schrittweise auf PyObjC
+vereinheitlichen, rumps mittelfristig ablösen.** Eine Sprache, ein Repo, Tests bleiben, kein
+IPC. Der aktuelle Dual-Style (rumps-Menü + PyObjC-Fenster) ist **nur Übergang**, kein Zielbild.
+
+Leitplanke für jede Änderung: **rumps-Kopplung nicht vertiefen** — neue UI ausschließlich
+PyObjC. Erledigter erster Baustein: das Settings-`settings_window.py` (rumps-frei).
+
+Verbleibende, je eigenständig ausliefer- und testbare Bricks (verifizierte Teile bleiben bis
+dahin unangetastet):
+1. **Dialoge** — restliche `rumps.alert`/`rumps.Window` (`_show_last_lines`, Rollback-/Backup-
+   Bestätigungen, Fehler-Alerts) auf einen kleinen `NSAlert`-Helfer. Günstigster nächster Schritt.
+2. **Statusleiste** — `rumps.App`/`rumps.MenuItem` → `NSStatusItem` + `NSMenu`.
+3. **Timer** — `rumps.Timer` → `NSTimer`/`DispatchSource`.
+4. **Notifications** — `rumps.notification` → `UNUserNotificationCenter` (pync-Fallback entfällt).
+5. **Runloop + Dependency** — eigene `NSApplication`-Runloop, danach `rumps` aus `requirements.txt`.
+
+Reihenfolge minimiert Risiko (zuerst das Störende, zuletzt die stabile Runloop); jeder Brick hält
+die Suite grün.
