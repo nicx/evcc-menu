@@ -337,7 +337,8 @@ class EvccMenuApp(rumps.App):
                 f"Update verfügbar: {latest}",
                 "Eine neue evcc-Version steht bereit.\n\n"
                 f"Verfügbar:   {latest}\n"
-                f"Installiert: {self._installed_version or '—'}\n\n"
+                f"Installiert: {self._installed_version or '—'}\n"
+                f"Changelog:   {updater.release_url(release)}\n\n"
                 "Installation über das Menü: 'Update installieren…'.")
             # Version nur dann als gemeldet merken, wenn die Mail wirklich rausging — sonst
             # bei späterer Mail-Aktivierung erneut versuchen.

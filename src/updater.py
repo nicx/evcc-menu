@@ -87,6 +87,15 @@ def release_version(release: dict) -> Optional[str]:
     return ".".join(map(str, v)) if v else None
 
 
+def release_url(release: dict) -> str:
+    """URL der GitHub-Release-Seite (= Changelog/Release Notes) für diese Version.
+
+    Nutzt das ``html_url`` des Release-Dicts; fehlt es, wird die generische Releases-Liste
+    von evcc-io/evcc zurückgegeben (immer ein brauchbarer Changelog-Link).
+    """
+    return release.get("html_url") or "https://github.com/evcc-io/evcc/releases"
+
+
 def select_asset(release: dict) -> Optional[dict]:
     """Wählt das macOS-Universal-Tarball-Asset (``evcc_<version>_macOS_all.tar.gz``)."""
     for asset in release.get("assets", []):

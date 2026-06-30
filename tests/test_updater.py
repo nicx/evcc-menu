@@ -61,6 +61,14 @@ class AssetSelectTest(unittest.TestCase):
         self.assertEqual(updater.release_version({"tag_name": "0.207.1"}), "0.207.1")
         self.assertEqual(updater.release_version({"name": "Release v0.208.0"}), "0.208.0")
 
+    def test_release_url(self):
+        # html_url des Releases = Changelog/Release-Notes für diese Version.
+        self.assertEqual(
+            updater.release_url({"html_url": "https://github.com/evcc-io/evcc/releases/tag/0.309.2"}),
+            "https://github.com/evcc-io/evcc/releases/tag/0.309.2")
+        # Fehlt es, generische Releases-Liste als Fallback.
+        self.assertEqual(updater.release_url({}), "https://github.com/evcc-io/evcc/releases")
+
 
 class ChecksumTest(unittest.TestCase):
     def test_verify_sha256(self):
